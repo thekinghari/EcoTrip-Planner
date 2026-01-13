@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\Eco Trip Planner\components\models.py
+# hypothesis_version: 6.150.1
+
+[0.0, 100, 'AlternativeRoute', 'Bus', 'Car', 'EmissionsResult', 'Flight', 'GeographicLocation', 'Train', 'TripData', 'accommodation', 'destination_city', 'hotel_nights', 'num_travelers', 'origin_city', 'outbound_date', 'per_person_emissions', 'return_date', 'total_co2e_kg', 'transport', 'transport_emissions', 'travel_modes']

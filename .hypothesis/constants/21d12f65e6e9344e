@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\Eco Trip Planner\components\carbon_calculator.py
+# hypothesis_version: 6.150.1
+
+[0.0, 100, 365, 50000, 'Bus', 'Car', 'Flight', 'Hotel', 'Train', '_calculation_errors', 'api_status', 'errors', 'fallback_active', 'get_api_status', 'has_errors']

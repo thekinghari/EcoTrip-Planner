@@ -1,0 +1,38 @@
+[global]
+# Development mode settings
+developmentMode = false
+
+[server]
+# Server configuration
+port = 8501
+baseUrlPath = ""
+enableCORS = true
+enableXsrfProtection = true
+maxUploadSize = 200
+maxMessageSize = 200
+enableWebsocketCompression = false
+
+# Performance settings
+runOnSave = false
+allowRunOnSave = false
+
+[browser]
+# Browser settings
+serverAddress = "localhost"
+gatherUsageStats = false
+serverPort = 8501
+
+[theme]
+# Eco-friendly theme colors
+primaryColor = "#32CD32"        # Lime green for primary elements
+backgroundColor = "#f0f8f0"     # Light green background
+secondaryBackgroundColor = "#e8f5e8"  # Slightly darker green for containers
+textColor = "#2F4F4F"          # Dark slate gray for text
+
+# Font settings
+font = "sans serif"
+
+[logger]
+# Logging configuration
+level = "info"
+messageFormat = "%(asctime)s %(message)s"

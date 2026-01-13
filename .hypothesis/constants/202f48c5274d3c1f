@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\Eco Trip Planner\components\api_client.py
+# hypothesis_version: 6.150.1
+
+[0.0, 0.041, 0.089, 0.171, 0.255, 0.6, 1.0, 30.0, 100, 429, 2023, 'Authorization', 'Bus', 'CLIMATIQ_API_KEY', 'Car', 'Content-Type', 'DEFRA', 'Flight', 'GOOGLE_MAPS_API_KEY', 'Hotel', 'IN', 'INVALID_REQUEST', 'OVER_QUERY_LIMIT', 'REQUEST_DENIED', 'Retry-After', 'Train', 'ZERO_RESULTS', 'activity_id', 'application/json', 'climatiq', 'co2e', 'distance', 'distance_unit', 'emission_factor', 'error', 'estimate', 'google_maps', 'key', 'km', 'parameters', 'region', 'source', 'status', 'year']

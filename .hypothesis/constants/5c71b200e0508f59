@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\Eco Trip Planner\components\ui_components.py
+# hypothesis_version: 6.150.1
+
+[365, '**Travel Dates** 📅', '**Travel Modes** 🚗', '---', 'Ahmedabad', 'Ahmedabad to Surat', 'Bangalore', 'Bhubaneswar', 'Bus', 'Calculating...', 'Car', 'Chennai', 'Chennai to Bangalore', 'Delhi', 'Delhi to Jaipur', 'Delhi to Mumbai', 'Destination City *', 'Flight', 'Goa', 'Goa to Mumbai', 'Hotel Nights', 'Hyderabad', 'Invalid date format', 'Jaipur', 'Kochi', 'Kolkata', 'Mumbai', 'Mumbai to Pune', 'Origin City *', 'Outbound Date *', 'Pune', 'Salem', 'Salem to Chennai', 'Select a route...', 'Surat', 'Thiruvananthapuram', 'Train', 'destination_city', 'errors', 'hotel_nights', 'is_valid', 'num_travelers', 'origin_city', 'outbound_date', 'primary', 'return_date', 'travel_modes', 'trip_input_form', '🌱 EcoTrip Planner', '📝 Trip Details', '🚗 Alternative Routes']

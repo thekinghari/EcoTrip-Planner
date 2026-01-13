@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\Eco Trip Planner\components\session_manager.py
+# hypothesis_version: 6.150.1
+
+['alternatives_count', 'alternatives_data', 'co2e_emissions_kg', 'cost_difference_inr', 'destination_city', 'distance_km', 'duration_hours', 'emissions_data', 'emissions_data_keys', 'emissions_savings_kg', 'estimated_cost_inr', 'has_emissions_data', 'has_trip_data', 'hotel_nights', 'num_travelers', 'origin_city', 'outbound_date', 'per_person_emissions', 'route_details', 'total_co2e_kg', 'transport_emissions', 'transport_mode', 'travel_modes', 'trip_data', 'trip_data_keys']
