@@ -62,7 +62,7 @@ def main():
 def configure_streamlit_app():
     """Configure Streamlit application settings with deployment-ready options"""
     # Get configuration from environment variables with defaults
-    page_title = os.getenv('STREAMLIT_PAGE_TITLE', '🌱 EcoTrip Planner - Sustainable Travel Calculator')
+    page_title = os.getenv('STREAMLIT_PAGE_TITLE', ' EcoTrip Planner - Sustainable Travel Calculator')
     page_icon = os.getenv('STREAMLIT_PAGE_ICON', '🌱')
     layout = os.getenv('STREAMLIT_LAYOUT', 'wide')
     sidebar_state = os.getenv('STREAMLIT_SIDEBAR_STATE', 'expanded')
