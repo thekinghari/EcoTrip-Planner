@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\EcoTrip-Planner\components\ml_route_predictor.py
+# hypothesis_version: 6.150.1
+
+[0.0, 0.1, 0.5, 1.0, 1.15, 1.2, 1.25, 3.0, 45.0, 50.0, 60.0, 500.0, 100, 200, 'Bus', 'Car', 'Flight', 'Train', 'average_speed_kmh', 'comfort', 'destination', 'distance', 'distance_km', 'duration_hours', 'estimated_stops', 'fastest_mode', 'is_predicted', 'max_distance', 'max_duration', 'ml_geographic', 'mode', 'origin', 'prediction_method', 'priority', 'route_type', 'routes', 'shortest_distance', 'speed']

@@ -428,6 +428,50 @@ def handle_alternative_routes(trip_data: Dict[str, Any], emissions_data: Dict[st
                 )
                 
                 if alternatives:
+                    # Calculate baseline cost from user's selected travel modes and distance
+                    # Use the distance from the first alternative as baseline distance
+                    baseline_distance = alternatives[0].get('distance_km', 0) if alternatives else 0
+                    baseline_cost = 0.0
+                    
+                    # Calculate baseline cost based on user's selected modes
+                    selected_modes = trip_data.get('travel_modes', [])
+                    num_travelers = trip_data.get('num_travelers', 1)
+                    
+                    if selected_modes and baseline_distance > 0:
+                        # Use the cheapest selected mode as baseline for cost comparison
+                        mode_costs = []
+                        for mode in selected_modes:
+                            cost = route_analyzer.estimate_costs(mode, baseline_distance, num_travelers)
+                            mode_costs.append(cost)
+                        baseline_cost = min(mode_costs) if mode_costs else 0.0
+                    
+                    # Update alternatives with proper savings calculations
+                    # First convert dict alternatives to AlternativeRoute objects
+                    alternative_objects = []
+                    for alt in alternatives:
+                        from components.models import AlternativeRoute
+                        alt_obj = AlternativeRoute(
+                            transport_mode=alt.get('transport_mode', ''),
+                            duration_hours=alt.get('duration_hours', 0.0),
+                            distance_km=alt.get('distance_km', 0.0),
+                            co2e_emissions_kg=alt.get('co2e_emissions_kg', 0.0),
+                            estimated_cost_inr=alt.get('estimated_cost_inr', 0.0),
+                            emissions_savings_kg=alt.get('emissions_savings_kg', 0.0),
+                            cost_difference_inr=alt.get('cost_difference_inr', 0.0),
+                            route_details=alt.get('route_details', {})
+                        )
+                        alternative_objects.append(alt_obj)
+                    
+                    # Calculate savings relative to baseline
+                    alternatives_with_savings = route_analyzer.compute_savings_relative_to_baseline(
+                        alternative_objects,
+                        baseline_emissions,
+                        baseline_cost
+                    )
+                    
+                    # Convert back to dict format for storage
+                    alternatives = [alt.to_dict() for alt in alternatives_with_savings]
+                    
                     # Ensure alternatives are sorted by emissions (greenest first)
                     alternatives = sorted(alternatives, key=lambda x: x.get('co2e_emissions_kg', float('inf')))
                     

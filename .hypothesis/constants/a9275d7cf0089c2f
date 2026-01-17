@@ -1,0 +1,4 @@
+# file: C:\Users\DELL\Documents\GitHub\EcoTrip-Planner\components\ml_emissions_model.py
+# hypothesis_version: 6.150.1
+
+[-5e-05, -2e-05, 0.0, 0.0001, 0.01, 0.041, 0.089, 0.171, 0.255, 0.7, 0.95, 1.0, 1.05, 1.5, 30.0, 2000, '1.0', 'Bus', 'Car', 'Flight', 'Hotel', 'IN', 'Train', 'base', 'base_factors', 'budget', 'distance_factor', 'emissions_model.pkl', 'is_trained', 'luxury', 'model_type', 'models', 'rb', 'region', 'rule_based', 'standard', 'type', 'version', 'wb']

@@ -954,10 +954,10 @@ class VisualizationComponents:
             # Format emissions savings with color coding
             savings_kg = alt.get('emissions_savings_kg', 0.0)
             if savings_kg > 0:
-                savings_text = f"✅ -{savings_kg:.1f} kg"
+                savings_text = f"✅ +{savings_kg:.1f} kg saved"
                 savings_color = "green"
             elif savings_kg < 0:
-                savings_text = f"❌ +{abs(savings_kg):.1f} kg"
+                savings_text = f"❌ +{abs(savings_kg):.1f} kg more"
                 savings_color = "red"
             else:
                 savings_text = "➖ 0.0 kg"
@@ -966,9 +966,9 @@ class VisualizationComponents:
             # Format cost difference
             cost_diff = alt.get('cost_difference_inr', 0.0)
             if cost_diff > 0:
-                cost_text = f"💰 +₹{cost_diff:.0f}"
+                cost_text = f"💰 +₹{cost_diff:.0f} more"
             elif cost_diff < 0:
-                cost_text = f"💚 -₹{abs(cost_diff):.0f}"
+                cost_text = f"💚 ₹{abs(cost_diff):.0f} saved"
             else:
                 cost_text = "➖ ₹0"
             
