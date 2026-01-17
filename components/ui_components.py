@@ -1102,14 +1102,19 @@ class VisualizationComponents:
     
     @staticmethod
     def render_route_map(alternatives: List[Dict[str, Any]], origin: str, destination: str) -> None:
-        """Embed interactive map using folium with route markers"""
+        """Embed interactive map using folium with route markers and alternate routes with waypoints"""
         try:
             import folium
             from streamlit_folium import st_folium
             
             # Get coordinates for origin and destination
             from .geographic_data import GeographicDataManager
+            from .route_optimizer import RouteOptimizer
+            from .carbon_calculator import CarbonCalculator
+            
             geo_manager = GeographicDataManager()
+            route_optimizer = RouteOptimizer()
+            carbon_calculator = CarbonCalculator()
             
             origin_coords = geo_manager.get_city_coordinates(origin)
             dest_coords = geo_manager.get_city_coordinates(destination)
@@ -1126,67 +1131,279 @@ class VisualizationComponents:
             center_lat = (origin_lat + dest_lat) / 2
             center_lon = (origin_lon + dest_lon) / 2
             
-            # Create map
-            m = folium.Map(
-                location=[center_lat, center_lon],
-                zoom_start=6,
-                tiles='OpenStreetMap'
-            )
+            # Generate alternate routes with waypoints (more routes for better options)
+            alternate_routes = route_optimizer.generate_alternate_routes(origin, destination, num_routes=5)
             
-            # Add origin marker
-            folium.Marker(
-                [origin_lat, origin_lon],
-                popup=f"🏁 Origin: {origin}",
-                tooltip=f"Start: {origin}",
-                icon=folium.Icon(color='green', icon='play')
-            ).add_to(m)
+            # Calculate detailed route information for each route
+            route_details_list = []
+            direct_distance = None
             
-            # Add destination marker
-            folium.Marker(
-                [dest_lat, dest_lon],
-                popup=f"🏁 Destination: {destination}",
-                tooltip=f"End: {destination}",
-                icon=folium.Icon(color='red', icon='stop')
-            ).add_to(m)
-            
-            # Add route line
-            folium.PolyLine(
-                locations=[
-                    [origin_lat, origin_lon],
-                    [dest_lat, dest_lon]
-                ],
-                color='blue',
-                weight=3,
-                opacity=0.7,
-                popup=f"Route: {origin} → {destination}"
-            ).add_to(m)
-            
-            # Add markers for alternative transport modes
-            colors = ['purple', 'orange', 'darkblue', 'darkgreen']
-            for i, alt in enumerate(alternatives[:4]):  # Limit to 4 alternatives
-                mode = alt.get('transport_mode', 'Unknown')
-                emissions = alt.get('co2e_emissions_kg', 0)
-                cost = alt.get('estimated_cost_inr', 0)
+            for idx, route_info in enumerate(alternate_routes):
+                waypoints = route_info.get('waypoints', [])
+                route_name = route_info.get('name', f'Route {idx + 1}')
+                description = route_info.get('description', '')
                 
-                # Add marker at midpoint for each alternative
-                mid_lat = center_lat + (i - 1.5) * 0.1  # Offset markers slightly
-                mid_lon = center_lon + (i - 1.5) * 0.1
+                # Calculate route distance
+                route_distance = route_optimizer.calculate_route_distance(
+                    origin, destination, waypoints
+                )
                 
+                if direct_distance is None and not waypoints:
+                    direct_distance = route_distance
+                
+                # Calculate carbon footprint for different modes
+                # Using simplified calculation (distance * emission_factor)
+                emission_factors = {
+                    'Car': 0.12,  # kg CO2e per km per person
+                    'Bus': 0.08,
+                    'Train': 0.04,
+                    'Flight': 0.25
+                }
+                
+                # Estimate carbon for different transport modes (for 1 person)
+                carbon_estimates = {}
+                for mode, factor in emission_factors.items():
+                    carbon_estimates[mode] = route_distance * factor
+                
+                # Determine if this is a shortcut
+                is_shortcut = False
+                distance_savings = 0
+                if direct_distance and route_distance < direct_distance * 0.98:  # 2% tolerance
+                    is_shortcut = True
+                    distance_savings = direct_distance - route_distance
+                
+                # Calculate efficiency score (lower distance = higher efficiency)
+                efficiency_score = 100.0
+                if direct_distance and direct_distance > 0:
+                    efficiency_score = (direct_distance / route_distance) * 100 if route_distance > 0 else 100
+                
+                route_details_list.append({
+                    'index': idx,
+                    'name': route_name,
+                    'waypoints': waypoints,
+                    'description': description,
+                    'distance_km': route_distance,
+                    'carbon_estimates': carbon_estimates,
+                    'is_shortcut': is_shortcut,
+                    'distance_savings': distance_savings,
+                    'efficiency_score': efficiency_score
+                })
+            
+            # Sort routes by distance (shortest first)
+            route_details_list.sort(key=lambda x: x['distance_km'])
+            
+            # Route colors for different alternatives
+            route_colors = ['blue', 'purple', 'orange', 'darkgreen', 'darkblue']
+            
+            # Display route information
+            st.subheader("🗺️ Route Map with Alternate Routes & Efficiency Plan")
+            
+            # Create two-column layout
+            col_left, col_right = st.columns([1.1, 1.9])
+            
+            with col_left:
+                st.markdown("### 📋 Route Planning Panel")
+                st.markdown(f"**Route:** {origin} → {destination}")
+                st.markdown("---")
+                
+                # Display each route with detailed information
+                for route_detail in route_details_list:
+                    idx = route_detail['index']
+                    waypoints = route_detail['waypoints']
+                    route_name = route_detail['name']
+                    distance = route_detail['distance_km']
+                    description = route_detail['description']
+                    carbon_estimates = route_detail['carbon_estimates']
+                    is_shortcut = route_detail['is_shortcut']
+                    distance_savings = route_detail['distance_savings']
+                    efficiency_score = route_detail['efficiency_score']
+                    
+                    # Route card
+                    with st.container():
+                        st.markdown(f"""
+                        <div style="border: 2px solid {route_colors[idx % len(route_colors)]}; 
+                                    border-radius: 10px; padding: 15px; margin-bottom: 15px;
+                                    background-color: {'#e8f5e9' if is_shortcut else '#f5f5f5'};">
+                        <h4 style="color: {route_colors[idx % len(route_colors)]}; margin-top: 0;">
+                            {route_name}
+                        </h4>
+                        """, unsafe_allow_html=True)
+                        
+                        # Route path
+                        if waypoints:
+                            waypoints_str = " → ".join(waypoints)
+                            route_str = f"{origin} → **{waypoints_str}** → {destination}"
+                        else:
+                            route_str = f"{origin} → {destination}"
+                        
+                        st.markdown(f"**Path:** {route_str}")
+                        
+                        # Distance and efficiency
+                        col_dist, col_eff = st.columns(2)
+                        with col_dist:
+                            st.metric("Distance", f"{distance:.1f} km")
+                        with col_eff:
+                            st.metric("Efficiency", f"{efficiency_score:.1f}%")
+                        
+                        # Shortcut indicator
+                        if is_shortcut:
+                            st.success(f"✨ Shortcut! Saves {distance_savings:.1f} km ({((distance_savings/direct_distance)*100):.1f}%)")
+                        
+                        # Waypoints info
+                        if waypoints:
+                            st.markdown(f"**📍 Places Covered:** {len(waypoints)} cities")
+                            for wp_idx, wp in enumerate(waypoints, 1):
+                                st.markdown(f"  {wp_idx}. {wp}")
+                        
+                        # Carbon footprint estimates
+                        st.markdown("**🌱 Carbon Footprint (CO₂e):**")
+                        carbon_data = []
+                        for mode, co2e in carbon_estimates.items():
+                            carbon_data.append(f"- {mode}: {co2e:.2f} kg")
+                        st.markdown("\n".join(carbon_data))
+                        
+                        # Description
+                        if description:
+                            st.markdown(f"*💡 {description}*")
+                        
+                        st.markdown("</div>", unsafe_allow_html=True)
+                        st.markdown("---")
+                
+                # Summary statistics
+                st.markdown("### 📊 Route Summary")
+                shortest_distance = min(r['distance_km'] for r in route_details_list)
+                longest_distance = max(r['distance_km'] for r in route_details_list)
+                avg_distance = sum(r['distance_km'] for r in route_details_list) / len(route_details_list)
+                
+                st.metric("Shortest Route", f"{shortest_distance:.1f} km")
+                st.metric("Longest Route", f"{longest_distance:.1f} km")
+                st.metric("Average Distance", f"{avg_distance:.1f} km")
+                
+                # Best option recommendation
+                best_route = min(route_details_list, key=lambda x: x['distance_km'])
+                st.info(f"🏆 **Recommended:** {best_route['name']} ({best_route['distance_km']:.1f} km) - Most efficient route with lowest carbon footprint")
+            
+            with col_right:
+                # Create map
+                m = folium.Map(
+                    location=[center_lat, center_lon],
+                    zoom_start=7 if abs(origin_lat - dest_lat) < 5 else 6,
+                    tiles='OpenStreetMap'
+                )
+                
+                # Add origin marker
                 folium.Marker(
-                    [mid_lat, mid_lon],
-                    popup=f"{VisualizationComponents._get_mode_emoji(mode)} {mode}<br>Emissions: {emissions:.1f} kg CO₂e<br>Cost: ₹{cost:.0f}",
-                    tooltip=f"{mode}: {emissions:.1f} kg CO₂e",
-                    icon=folium.Icon(color=colors[i % len(colors)], icon='info-sign')
+                    [origin_lat, origin_lon],
+                    popup=f"🏁 Origin: {origin}",
+                    tooltip=f"Start: {origin}",
+                    icon=folium.Icon(color='green', icon='play')
                 ).add_to(m)
-            
-            # Display map
-            st.subheader("🗺️ Route Map")
-            st_folium(m, width=700, height=400)
+                
+                # Add destination marker
+                folium.Marker(
+                    [dest_lat, dest_lon],
+                    popup=f"🏁 Destination: {destination}",
+                    tooltip=f"End: {destination}",
+                    icon=folium.Icon(color='red', icon='stop')
+                ).add_to(m)
+                
+                # Draw each alternate route on the map
+                for route_detail in route_details_list:
+                    idx = route_detail['index']
+                    waypoints = route_detail['waypoints']
+                    route_name = route_detail['name']
+                    
+                    # Get coordinates for the route path
+                    route_coords = route_optimizer.get_route_coordinates(
+                        origin, destination, waypoints
+                    )
+                    
+                    if len(route_coords) >= 2:
+                        # Draw polyline for this route
+                        line_weight = 4 if idx == 0 else 3  # Make shortest route thicker
+                        line_opacity = 0.9 if idx == 0 else 0.6
+                        folium.PolyLine(
+                            locations=[[lat, lon] for lat, lon in route_coords],
+                            color=route_colors[idx % len(route_colors)],
+                            weight=line_weight,
+                            opacity=line_opacity,
+                            popup=f"{route_name}: {origin} → {destination}",
+                            tooltip=f"{route_name} ({route_detail['distance_km']:.1f} km)"
+                        ).add_to(m)
+                        
+                        # Add waypoint markers
+                        for waypoint_idx, waypoint in enumerate(waypoints):
+                            waypoint_coords = geo_manager.get_city_coordinates(waypoint)
+                            if waypoint_coords:
+                                wp_lat, wp_lon = waypoint_coords
+                                folium.Marker(
+                                    [wp_lat, wp_lon],
+                                    popup=f"📍 Waypoint {waypoint_idx + 1}: {waypoint}",
+                                    tooltip=f"{waypoint} (via {route_name})",
+                                    icon=folium.Icon(color='lightblue', icon='info-sign')
+                                ).add_to(m)
+                
+                # Try to decode polyline from alternatives if available (from API)
+                polyline_found = False
+                for alt in alternatives:
+                    route_details = alt.get('route_details', {})
+                    polyline = route_details.get('polyline', '')
+                    
+                    if polyline and not polyline_found:
+                        try:
+                            # Try to decode polyline using polyline library if available
+                            try:
+                                import polyline as pl
+                                decoded_coords = pl.decode(polyline)
+                                if decoded_coords:
+                                    # Convert to [lat, lon] format for folium
+                                    polyline_points = [[lat, lon] for lat, lon in decoded_coords]
+                                    
+                                    # Draw actual route from API if available
+                                    folium.PolyLine(
+                                        locations=polyline_points,
+                                        color='darkred',
+                                        weight=2,
+                                        opacity=0.7,
+                                        popup=f"API Route: {origin} → {destination}",
+                                        tooltip="Route from API",
+                                        dashArray='5, 5'  # Dashed line to differentiate
+                                    ).add_to(m)
+                                    polyline_found = True
+                            except ImportError:
+                                # polyline library not available, skip
+                                pass
+                        except Exception:
+                            # If polyline decoding fails, continue without it
+                            pass
+                
+                # Add legend
+                legend_html = '''
+                <div style="position: fixed; 
+                            bottom: 50px; right: 50px; width: 220px; height: auto; 
+                            background-color: white; border:2px solid grey; z-index:9999; 
+                            font-size:14px; padding: 10px; border-radius: 5px;">
+                <h4 style="margin-top: 0;">Route Legend</h4>
+                <p><i class="fa fa-map-marker" style="color:green"></i> Origin</p>
+                <p><i class="fa fa-map-marker" style="color:red"></i> Destination</p>
+                <p><i class="fa fa-map-marker" style="color:lightblue"></i> Waypoints</p>
+                <p style="color:blue; font-weight:bold">━ Shortest Route</p>
+                <p style="color:purple">━ Via Waypoints</p>
+                <p style="color:orange">━ Alternate Routes</p>
+                </div>
+                '''
+                m.get_root().html.add_child(folium.Element(legend_html))
+                
+                # Display map
+                st_folium(m, width=None, height=600, returned_objects=[])
             
         except ImportError:
             st.warning("⚠️ Map display requires folium and streamlit-folium packages")
         except Exception as e:
             st.error(f"⚠️ Could not display map: {str(e)}")
+            import traceback
+            with st.expander("🔍 Error Details"):
+                st.code(traceback.format_exc())
     
     @staticmethod
     def render_india_travel_tips() -> None:
