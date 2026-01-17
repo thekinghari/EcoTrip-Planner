@@ -123,6 +123,7 @@ def apply_eco_styling():
         text-align: center;
         margin: 0;
         font-size: 2.5rem;
+        word-wrap: break-word;
     }
     
     .main-header p {
@@ -130,6 +131,7 @@ def apply_eco_styling():
         text-align: center;
         margin: 0.5rem 0 0 0;
         font-size: 1.2rem;
+        word-wrap: break-word;
     }
     
     /* Form styling */
@@ -142,7 +144,16 @@ def apply_eco_styling():
         margin-bottom: 2rem;
     }
     
-    /* Button styling */
+    /* Input fields styling for better mobile experience */
+    .stTextInput > div > div > input,
+    .stSelectbox > div > div > select,
+    .stNumberInput > div > div > input,
+    .stDateInput > div > div > input {
+        min-height: 44px; /* Minimum touch target size for mobile */
+        font-size: 16px; /* Prevents zoom on iOS */
+    }
+    
+    /* Button styling - touch-friendly */
     .stButton > button {
         background: linear-gradient(90deg, #32CD32 0%, #228B22 100%);
         color: white;
@@ -151,12 +162,19 @@ def apply_eco_styling():
         padding: 0.75rem 2rem;
         font-weight: bold;
         transition: all 0.3s ease;
+        min-height: 44px; /* Minimum touch target size */
+        width: 100%;
+        max-width: 100%;
     }
     
     .stButton > button:hover {
         background: linear-gradient(90deg, #228B22 0%, #006400 100%);
         transform: translateY(-2px);
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .stButton > button:active {
+        transform: translateY(0);
     }
     
     /* Metric styling */
@@ -196,11 +214,21 @@ def apply_eco_styling():
         border-radius: 12px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         margin: 1rem 0;
+        width: 100%;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+    
+    /* Make Plotly charts responsive */
+    .js-plotly-plot {
+        max-width: 100% !important;
+        height: auto !important;
     }
     
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;
+        flex-wrap: wrap; /* Allow tabs to wrap on small screens */
     }
     
     .stTabs [data-baseweb="tab"] {
@@ -208,6 +236,8 @@ def apply_eco_styling():
         border-radius: 8px;
         padding: 0.5rem 1rem;
         border: 2px solid transparent;
+        min-height: 44px; /* Touch-friendly */
+        font-size: 0.9rem;
     }
     
     .stTabs [aria-selected="true"] {
@@ -230,6 +260,7 @@ def apply_eco_styling():
     .streamlit-expanderHeader {
         background-color: #f0f8f0;
         border-radius: 8px;
+        min-height: 44px; /* Touch-friendly */
     }
     
     /* Custom eco badges */
@@ -253,6 +284,247 @@ def apply_eco_styling():
         font-size: 0.8rem;
         font-weight: bold;
         margin: 0.2rem;
+    }
+    
+    /* Dataframe/table styling for mobile */
+    .stDataFrame {
+        width: 100%;
+        overflow-x: auto;
+        display: block;
+    }
+    
+    /* Column containers - responsive */
+    [data-testid="column"] {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+    
+    /* ============================================
+       RESPONSIVE DESIGN - MOBILE & TABLET
+       ============================================ */
+    
+    /* Mobile devices (max-width: 768px) */
+    @media screen and (max-width: 768px) {
+        /* Header adjustments */
+        .main-header {
+            padding: 1.5rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .main-header h1 {
+            font-size: 1.75rem;
+            line-height: 1.3;
+        }
+        
+        .main-header p {
+            font-size: 1rem;
+            line-height: 1.4;
+        }
+        
+        /* Form adjustments */
+        .stForm {
+            padding: 1.5rem 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+            border-width: 2px;
+        }
+        
+        /* Button full width on mobile */
+        .stButton > button {
+            padding: 0.875rem 1.5rem;
+            font-size: 1rem;
+        }
+        
+        /* Metric container */
+        .metric-container {
+            padding: 1rem;
+            margin: 0.75rem 0;
+        }
+        
+        /* Chart container */
+        .chart-container {
+            padding: 1rem;
+            margin: 0.75rem 0;
+            border-radius: 10px;
+        }
+        
+        /* Success/Info messages */
+        .stSuccess,
+        .stInfo {
+            padding: 0.875rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Tabs - full width on mobile */
+        .stTabs [data-baseweb="tab"] {
+            flex: 1 1 auto;
+            min-width: 0;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+        }
+        
+        /* Expander */
+        .streamlit-expanderHeader {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+        
+        /* Badges */
+        .eco-badge,
+        .warning-badge {
+            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            margin: 0.15rem;
+        }
+        
+        /* Main container padding */
+        .main .block-container {
+            padding-left: 1rem;
+            padding-right: 1rem;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        /* Sidebar adjustments */
+        .css-1d391kg {
+            padding: 1rem;
+        }
+        
+        /* Hide horizontal scrollbar on mobile when not needed */
+        body {
+            overflow-x: hidden;
+        }
+        
+        /* Make tables horizontally scrollable */
+        .stDataFrame > div {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+    }
+    
+    /* Tablet devices (max-width: 1024px) */
+    @media screen and (max-width: 1024px) and (min-width: 769px) {
+        /* Header adjustments */
+        .main-header {
+            padding: 1.75rem 1.5rem;
+        }
+        
+        .main-header h1 {
+            font-size: 2rem;
+        }
+        
+        .main-header p {
+            font-size: 1.1rem;
+        }
+        
+        /* Form adjustments */
+        .stForm {
+            padding: 1.75rem 1.5rem;
+        }
+        
+        /* Chart container */
+        .chart-container {
+            padding: 1.25rem;
+        }
+    }
+    
+    /* Small mobile devices (max-width: 480px) */
+    @media screen and (max-width: 480px) {
+        /* Header adjustments */
+        .main-header {
+            padding: 1.25rem 0.75rem;
+            border-radius: 8px;
+        }
+        
+        .main-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .main-header p {
+            font-size: 0.9rem;
+        }
+        
+        /* Form adjustments */
+        .stForm {
+            padding: 1.25rem 0.75rem;
+            border-radius: 8px;
+        }
+        
+        /* Button adjustments */
+        .stButton > button {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.95rem;
+        }
+        
+        /* Metric container */
+        .metric-container {
+            padding: 0.875rem;
+        }
+        
+        /* Chart container */
+        .chart-container {
+            padding: 0.875rem;
+        }
+        
+        /* Tabs - stack vertically if needed */
+        .stTabs [data-baseweb="tab-list"] {
+            flex-direction: column;
+        }
+        
+        .stTabs [data-baseweb="tab"] {
+            width: 100%;
+            margin-bottom: 0.5rem;
+        }
+        
+        /* Main container padding */
+        .main .block-container {
+            padding-left: 0.75rem;
+            padding-right: 0.75rem;
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+    }
+    
+    /* Landscape orientation on mobile */
+    @media screen and (max-width: 768px) and (orientation: landscape) {
+        .main-header {
+            padding: 1rem 1.5rem;
+        }
+        
+        .main-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .main-header p {
+            font-size: 0.9rem;
+        }
+    }
+    
+    /* Large screens (min-width: 1200px) - maintain readability */
+    @media screen and (min-width: 1200px) {
+        .main .block-container {
+            max-width: 1200px;
+            padding-left: 3rem;
+            padding-right: 3rem;
+        }
+    }
+    
+    /* Print styles */
+    @media print {
+        .main-header {
+            break-inside: avoid;
+        }
+        
+        .stForm {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
+        
+        .chart-container {
+            break-inside: avoid;
+            page-break-inside: avoid;
+        }
     }
     </style>
     """, unsafe_allow_html=True)

@@ -739,13 +739,17 @@ class VisualizationComponents:
                     yanchor="bottom",
                     y=-0.2,
                     xanchor="center",
-                    x=0.5
+                    x=0.5,
+                    font={'size': 12}
                 ),
                 margin=dict(t=50, b=50, l=20, r=20),
-                height=350
+                height=350,
+                autosize=True
             )
             
-            st.plotly_chart(fig, width='stretch')
+            # Use config for responsive charts
+            config = {'displayModeBar': True, 'responsive': True, 'displaylogo': False}
+            st.plotly_chart(fig, use_container_width=True, config=config)
         else:
             st.info("No emissions data available for breakdown")
     
@@ -794,12 +798,16 @@ class VisualizationComponents:
             },
             xaxis_title='Trip Category',
             yaxis_title='CO₂e Emissions (kg)',
-            xaxis={'tickangle': -45},
+            xaxis={'tickangle': -45, 'tickfont': {'size': 11}},
+            yaxis={'tickfont': {'size': 11}},
             margin=dict(t=50, b=100, l=50, r=20),
-            height=350
+            height=350,
+            autosize=True
         )
         
-        st.plotly_chart(fig, width='stretch')
+        # Use config for responsive charts
+        config = {'displayModeBar': True, 'responsive': True, 'displaylogo': False}
+        st.plotly_chart(fig, use_container_width=True, config=config)
     
     @staticmethod
     def _render_transport_mode_comparison(emissions_data: Dict[str, Any]) -> None:
@@ -835,11 +843,16 @@ class VisualizationComponents:
             },
             xaxis_title='Transport Mode',
             yaxis_title='CO₂e Emissions (kg)',
+            xaxis={'tickfont': {'size': 11}},
+            yaxis={'tickfont': {'size': 11}},
             margin=dict(t=50, b=50, l=50, r=20),
-            height=350
+            height=350,
+            autosize=True
         )
         
-        st.plotly_chart(fig, width='stretch')
+        # Use config for responsive charts
+        config = {'displayModeBar': True, 'responsive': True, 'displaylogo': False}
+        st.plotly_chart(fig, use_container_width=True, config=config)
     
     @staticmethod
     def _render_impact_summary(emissions_data: Dict[str, Any]) -> None:
@@ -1064,12 +1077,17 @@ class VisualizationComponents:
             },
             xaxis_title='Transport Mode',
             yaxis_title='CO₂e Emissions (kg)',
+            xaxis={'tickfont': {'size': 11}},
+            yaxis={'tickfont': {'size': 11}},
             showlegend=False,
             margin=dict(t=50, b=50, l=50, r=20),
-            height=350
+            height=350,
+            autosize=True
         )
         
-        st.plotly_chart(fig, width='stretch')
+        # Use config for responsive charts
+        config = {'displayModeBar': True, 'responsive': True, 'displaylogo': False}
+        st.plotly_chart(fig, use_container_width=True, config=config)
     
     @staticmethod
     def _get_mode_emoji(mode: str) -> str:
