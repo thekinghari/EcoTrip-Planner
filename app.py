@@ -225,6 +225,35 @@ def apply_eco_styling():
         height: auto !important;
     }
     
+    /* Fix Plotly chart title overlap with toolbar */
+    .js-plotly-plot .plotly .modebar {
+        top: 5px !important;
+        right: 5px !important;
+    }
+    
+    .js-plotly-plot .plotly .gtitle {
+        margin-top: 10px !important;
+    }
+    
+    /* Mobile-specific Plotly fixes */
+    @media (max-width: 768px) {
+        .js-plotly-plot .plotly .modebar {
+            top: 2px !important;
+            right: 2px !important;
+            font-size: 12px !important;
+        }
+        
+        .js-plotly-plot .plotly .gtitle {
+            margin-top: 15px !important;
+            font-size: 14px !important;
+        }
+        
+        .js-plotly-plot .plotly .modebar-btn {
+            width: 20px !important;
+            height: 20px !important;
+        }
+    }
+    
     /* Tab styling */
     .stTabs [data-baseweb="tab-list"] {
         gap: 8px;

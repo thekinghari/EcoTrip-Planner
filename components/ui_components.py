@@ -770,6 +770,20 @@ class VisualizationComponents:
         categories = list(benchmarks.keys())
         values = list(benchmarks.values())
         
+        # Create shorter category names for better mobile display
+        short_categories = []
+        for cat in categories:
+            if cat == 'Short Distance (< 500km)':
+                short_categories.append('Short')
+            elif cat == 'Medium Distance (500-1500km)':
+                short_categories.append('Medium')
+            elif cat == 'Long Distance (> 1500km)':
+                short_categories.append('Long')
+            elif cat == 'Average Domestic Trip':
+                short_categories.append('Average')
+            else:
+                short_categories.append('Your Trip')
+        
         # Color coding: green for lower emissions, red for higher
         colors = []
         for category in categories:
@@ -781,33 +795,59 @@ class VisualizationComponents:
                 colors.append('#FFB6C1')  # Light pink for higher benchmarks
         
         fig = go.Figure(data=[go.Bar(
-            x=categories,
+            x=short_categories,
             y=values,
             marker_color=colors,
             text=[f'{v:.1f}' for v in values],
             textposition='auto',
-            hovertemplate='<b>%{x}</b><br>%{y:.2f} kg CO₂e per person<extra></extra>'
+            hovertemplate='<b>%{customdata}</b><br>%{y:.2f} kg CO₂e per person<extra></extra>',
+            customdata=categories  # Use full names in hover
         )])
         
         fig.update_layout(
             title={
-                'text': 'Benchmark Comparison (per person)',
+                'text': 'Benchmark Comparison',
                 'x': 0.5,
                 'xanchor': 'center',
                 'font': {'size': 16, 'color': '#2F4F4F'}
             },
             xaxis_title='Trip Category',
             yaxis_title='CO₂e Emissions (kg)',
-            xaxis={'tickangle': -45, 'tickfont': {'size': 11}},
+            xaxis={
+                'tickangle': 0,  # Keep horizontal to prevent overlap
+                'tickfont': {'size': 11},
+                'tickmode': 'array',
+                'tickvals': list(range(len(short_categories))),
+                'ticktext': short_categories
+            },
             yaxis={'tickfont': {'size': 11}},
-            margin=dict(t=50, b=100, l=50, r=20),
+            margin=dict(t=40, b=80, l=50, r=20),  # Reduced top margin to prevent title overlap
             height=350,
             autosize=True
         )
         
-        # Use config for responsive charts
-        config = {'displayModeBar': True, 'responsive': True, 'displaylogo': False}
+        # Use config for responsive charts with minimal toolbar to prevent title overlap
+        config = {
+            'displayModeBar': True, 
+            'responsive': True, 
+            'displaylogo': False,
+            'modeBarButtonsToRemove': ['pan2d', 'lasso2d', 'select2d', 'autoScale2d', 'toggleHover', 'toggleSpikelines'],
+            'toImageButtonOptions': {
+                'format': 'png',
+                'filename': 'benchmark_comparison',
+                'height': 350,
+                'width': 700,
+                'scale': 1
+            }
+        }
         st.plotly_chart(fig, use_container_width=True, config=config)
+        
+        # Add a legend below the chart to explain the shortened names
+        st.markdown("""
+        <div style="font-size: 0.85rem; color: #666; text-align: center; margin-top: -15px; margin-bottom: 10px;">
+        <strong>Per Person Emissions:</strong> Short (&lt;500km) • Medium (500-1500km) • Long (&gt;1500km) • Average (Indian domestic) • Your Trip
+        </div>
+        """, unsafe_allow_html=True)
     
     @staticmethod
     def _render_transport_mode_comparison(emissions_data: Dict[str, Any]) -> None:
@@ -895,12 +935,25 @@ class VisualizationComponents:
             # Compare against average benchmark
             avg_benchmark = VisualizationComponents.INDIAN_TRIP_BENCHMARKS['Average Domestic Trip']
             difference = per_person_emissions - avg_benchmark
-            delta_color = "inverse" if difference > 0 else "normal"
+            
+            # Show savings (positive when user is better than average)
+            if difference <= 0:
+                # User is better than or equal to average - show as positive savings
+                savings = abs(difference)
+                delta_color = "normal"  # Green for good performance
+                value_text = f"+{savings:.1f} kg saved"
+                delta_text = f"{abs((difference/avg_benchmark)*100):.1f}% better"
+            else:
+                # User is worse than average - show as excess emissions
+                excess = difference
+                delta_color = "inverse"  # Red for poor performance
+                value_text = f"+{excess:.1f} kg more"
+                delta_text = f"{(difference/avg_benchmark)*100:.1f}% higher"
             
             st.metric(
                 label="vs Average Trip",
-                value=f"{difference:+.1f} kg CO₂e",
-                delta=f"{(difference/avg_benchmark)*100:+.1f}%",
+                value=value_text,
+                delta=delta_text,
                 delta_color=delta_color,
                 help="Comparison with average Indian domestic trip emissions"
             )

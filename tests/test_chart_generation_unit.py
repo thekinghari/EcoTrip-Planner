@@ -178,12 +178,12 @@ class TestBenchmarkComparison:
             bar_data = fig.data[0]
             assert bar_data.type == 'bar'
             
-            # Should include all benchmark categories plus user's trip
+            # Should include all benchmark categories plus user's trip (shortened names for mobile responsiveness)
             expected_categories = [
-                'Short Distance (< 500km)',
-                'Medium Distance (500-1500km)', 
-                'Long Distance (> 1500km)',
-                'Average Domestic Trip',
+                'Short',
+                'Medium', 
+                'Long',
+                'Average',
                 'Your Trip'
             ]
             
@@ -192,6 +192,16 @@ class TestBenchmarkComparison:
             # User's trip value should match per_person_emissions
             user_trip_index = list(bar_data.x).index('Your Trip')
             assert bar_data.y[user_trip_index] == 120.0
+            
+            # Verify that full category names are available in hover data (customdata)
+            expected_full_categories = [
+                'Short Distance (< 500km)',
+                'Medium Distance (500-1500km)', 
+                'Long Distance (> 1500km)',
+                'Average Domestic Trip',
+                'Your Trip'
+            ]
+            assert list(bar_data.customdata) == expected_full_categories
     
     def test_benchmark_comparison_calculations(self):
         """
@@ -209,12 +219,12 @@ class TestBenchmarkComparison:
             fig = mock_plotly_chart.call_args[0][0]
             bar_data = fig.data[0]
             
-            # Verify benchmark values are included
+            # Verify benchmark values are included (using shortened category names)
             expected_benchmarks = {
-                'Short Distance (< 500km)': 45.0,
-                'Medium Distance (500-1500km)': 120.0,
-                'Long Distance (> 1500km)': 280.0,
-                'Average Domestic Trip': 150.0,
+                'Short': 45.0,
+                'Medium': 120.0,
+                'Long': 280.0,
+                'Average': 150.0,
                 'Your Trip': 200.0
             }
             
